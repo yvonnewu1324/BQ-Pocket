@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Star, Shuffle, ChevronRight, ChevronLeft, Edit3, Trash2, Eye, EyeOff, Building2, Filter, X, List, Zap, Moon, Sun } from "lucide-react";
 import { useCards } from "./hooks/useCards";
 import { SearchBar } from "./components/SearchBar";
@@ -423,12 +424,18 @@ function App() {
   );
 }
 
+const SWIPE_THRESHOLD = 50;
+const swipeVariants = {
+  enter: (dir) => ({ x: dir > 0 ? "100%" : "-100%", opacity: 0 }),
+  center: { x: 0, opacity: 1 },
+  exit: (dir) => ({ x: dir > 0 ? "-100%" : "100%", opacity: 0 }),
+};
+
 function FocusView({ cards, categories, companies, index, setIndex, onToggleStar, onEdit, onDelete }) {
   const [revealedIds, setRevealedIds] = useState(new Set());
   const [animating, setAnimating] = useState(false);
-  const [swipeOffset, setSwipeOffset] = useState(0);
+  const [direction, setDirection] = useState(0);
   const answerRef = useRef(null);
-  const touchRef = useRef({ startX: 0, startY: 0, swiping: false });
   const safeIndex = Math.min(index, cards.length - 1);
   const card = cards[safeIndex];
 
@@ -457,55 +464,32 @@ function FocusView({ cards, categories, companies, index, setIndex, onToggleStar
     const target = next
       ? Math.min(cards.length - 1, safeIndex + 1)
       : Math.max(0, safeIndex - 1);
-    setIndex(target);
-  }
-
-  const SWIPE_THRESHOLD = 60;
-
-  function handleTouchStart(e) {
-    const t = e.touches[0];
-    touchRef.current = { startX: t.clientX, startY: t.clientY, swiping: false };
-  }
-
-  function handleTouchMove(e) {
-    const t = e.touches[0];
-    const dx = t.clientX - touchRef.current.startX;
-    const dy = t.clientY - touchRef.current.startY;
-    if (!touchRef.current.swiping && Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy) * 1.5) {
-      touchRef.current.swiping = true;
-    }
-    if (touchRef.current.swiping) {
-      const atStart = safeIndex === 0 && dx > 0;
-      const atEnd = safeIndex === cards.length - 1 && dx < 0;
-      setSwipeOffset(atStart || atEnd ? dx * 0.2 : dx);
+    if (target !== safeIndex) {
+      setRevealedIds((prev) => {
+        const next = new Set(prev);
+        next.delete(card.id);
+        return next;
+      });
+      setAnimating(false);
+      setDirection(next ? 1 : -1);
+      setIndex(target);
     }
   }
 
-  function handleTouchEnd() {
-    if (touchRef.current.swiping) {
-      if (swipeOffset < -SWIPE_THRESHOLD && safeIndex < cards.length - 1) {
-        goTo(true);
-      } else if (swipeOffset > SWIPE_THRESHOLD && safeIndex > 0) {
-        goTo(false);
-      }
+  function handleDragEnd(_e, info) {
+    const { offset, velocity } = info;
+    const swipe = Math.abs(offset.x) * velocity.x;
+
+    if (offset.x < -SWIPE_THRESHOLD || swipe < -5000) {
+      goTo(true);
+    } else if (offset.x > SWIPE_THRESHOLD || swipe > 5000) {
+      goTo(false);
     }
-    setSwipeOffset(0);
-    touchRef.current.swiping = false;
   }
 
   return (
     <div className="pb-8">
-      <div
-        className="bg-white dark:bg-surface-card rounded-xl border border-border/60 shadow-sm dark:shadow-none overflow-hidden touch-pan-y"
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        style={{
-          transform: swipeOffset ? `translateX(${swipeOffset}px)` : undefined,
-          transition: swipeOffset ? "none" : "transform 0.3s ease-out",
-          opacity: swipeOffset ? Math.max(0.6, 1 - Math.abs(swipeOffset) / 400) : 1,
-        }}
-      >
+      <div className="bg-white dark:bg-surface-card rounded-xl border border-border/60 shadow-sm dark:shadow-none overflow-hidden">
         {/* Top bar */}
         <div className="flex items-center justify-between px-4 py-2.5 bg-gray-50/80 dark:bg-zinc-800/50 border-b border-border/50">
           <div className="flex items-center gap-1">
@@ -553,72 +537,103 @@ function FocusView({ cards, categories, companies, index, setIndex, onToggleStar
           </div>
         </div>
 
-        {/* Question */}
-        <div className="p-6 md:p-10">
-          <div className="flex items-center gap-2 flex-wrap mb-5">
-            {category && (
-              <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full ${category.color}`}>
-                {category.label}
-              </span>
-            )}
-            {company && (
-              <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400">
-                <Building2 size={10} />
-                {company.label}
-              </span>
-            )}
-          </div>
+        {/* Swipeable content */}
+        <div className="overflow-hidden relative">
+          <AnimatePresence initial={false} custom={direction} mode="popLayout">
+            <motion.div
+              key={card.id}
+              custom={direction}
+              variants={swipeVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ type: "tween", duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+              drag="x"
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={0.7}
+              onDragEnd={handleDragEnd}
+              className="touch-pan-y"
+            >
+              {/* Question */}
+              <div className="p-6 md:p-10">
+                <div className="flex items-center gap-2 flex-wrap mb-5">
+                  {category && (
+                    <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full ${category.color}`}>
+                      {category.label}
+                    </span>
+                  )}
+                  {company && (
+                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+                      <Building2 size={10} />
+                      {company.label}
+                    </span>
+                  )}
+                </div>
 
-          <h2 className="text-xl md:text-2xl font-extrabold text-text-primary leading-snug tracking-tight">
-            {card.question}
-          </h2>
+                <h2 className="text-xl md:text-2xl font-extrabold text-text-primary leading-snug tracking-tight">
+                  {card.question}
+                </h2>
+              </div>
+
+              {/* Reveal */}
+              {!revealed && (
+                <button
+                  onClick={() => {
+                    toggleRevealed(true);
+                    setTimeout(() => {
+                      answerRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }, 100);
+                  }}
+                  className="w-full flex items-center justify-center gap-2 px-5 py-4 bg-gradient-to-r from-brand-50 to-indigo-50 hover:from-brand-100 hover:to-indigo-100 dark:from-brand-500/10 dark:to-indigo-500/10 dark:hover:from-brand-500/20 dark:hover:to-indigo-500/20 border-t border-brand-100 dark:border-brand-500/20 text-brand-600 dark:text-brand-400 font-semibold text-sm transition-all"
+                >
+                  <Eye size={15} />
+                  Show Answer
+                </button>
+              )}
+
+              {/* Answer */}
+              {revealed && (
+                <div
+                  ref={answerRef}
+                  className={animating ? "overflow-hidden transition-all duration-500 ease-out" : ""}
+                  style={animating ? { maxHeight: "5000px", opacity: 1 } : undefined}
+                >
+                  <div className="border-t border-border/50 px-6 md:px-10 py-6 md:py-8">
+                    <MarkdownAnswer text={card.answer} />
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      toggleRevealed(false);
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                    className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-gray-50 hover:bg-gray-100 dark:bg-zinc-800/50 dark:hover:bg-zinc-800 border-t border-border/50 text-gray-400 dark:text-zinc-500 font-semibold text-xs transition-all"
+                  >
+                    <EyeOff size={13} />
+                    Hide Answer
+                  </button>
+                </div>
+              )}
+            </motion.div>
+          </AnimatePresence>
         </div>
 
-        {/* Reveal */}
-        {!revealed && (
-          <button
-            onClick={() => {
-              toggleRevealed(true);
-              setTimeout(() => {
-                answerRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-              }, 100);
-            }}
-            className="w-full flex items-center justify-center gap-2 px-5 py-4 bg-gradient-to-r from-brand-50 to-indigo-50 hover:from-brand-100 hover:to-indigo-100 dark:from-brand-500/10 dark:to-indigo-500/10 dark:hover:from-brand-500/20 dark:hover:to-indigo-500/20 border-t border-brand-100 dark:border-brand-500/20 text-brand-600 dark:text-brand-400 font-semibold text-sm transition-all"
-          >
-            <Eye size={15} />
-            Show Answer
-          </button>
-        )}
-
-        {/* Answer */}
-        {revealed && (
-          <div
-            ref={answerRef}
-            className={animating ? "overflow-hidden transition-all duration-500 ease-out" : ""}
-            style={animating ? { maxHeight: "5000px", opacity: 1 } : undefined}
-          >
-            <div className="border-t border-border/50 px-6 md:px-10 py-6 md:py-8">
-              <MarkdownAnswer text={card.answer} />
-            </div>
-
-            <button
-              onClick={() => {
-                toggleRevealed(false);
-                window.scrollTo({ top: 0, behavior: "smooth" });
-              }}
-              className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-gray-50 hover:bg-gray-100 dark:bg-zinc-800/50 dark:hover:bg-zinc-800 border-t border-border/50 text-gray-400 dark:text-zinc-500 font-semibold text-xs transition-all"
-            >
-              <EyeOff size={13} />
-              Hide Answer
-            </button>
+        {/* Progress dots */}
+        {cards.length > 1 && cards.length <= 20 && (
+          <div className="flex items-center justify-center gap-1.5 py-3 border-t border-border/50">
+            {cards.map((_, i) => (
+              <div
+                key={i}
+                className={`rounded-full transition-all duration-300 ${
+                  i === safeIndex
+                    ? "w-2 h-2 bg-brand-500"
+                    : "w-1.5 h-1.5 bg-gray-300 dark:bg-zinc-600"
+                }`}
+              />
+            ))}
           </div>
         )}
       </div>
-      {cards.length > 1 && (
-        <p className="text-center text-[11px] text-gray-400 dark:text-zinc-600 mt-3 md:hidden">
-          Swipe left or right to navigate
-        </p>
-      )}
     </div>
   );
 }
