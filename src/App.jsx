@@ -98,7 +98,7 @@ function App() {
   const hasActiveFilters = activeCategory !== "all" || activeCompany !== "all" || showStarredOnly;
 
   return (
-    <div className="h-screen flex flex-col bg-surface-dim overflow-hidden">
+    <div className="flex flex-col bg-surface-dim overflow-hidden" style={{ height: "100dvh" }}>
       {/* Header */}
       <header className="shrink-0 z-30 bg-white dark:bg-surface border-b border-border/60 shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-none">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
@@ -441,6 +441,7 @@ function FocusView({ cards, categories, companies, index, setIndex, onToggleStar
   const [animating, setAnimating] = useState(false);
   const [direction, setDirection] = useState(0);
   const scrollRef = useRef(null);
+  const touchRef = useRef(null);
   const safeIndex = Math.min(index, cards.length - 1);
   const card = cards[safeIndex];
 
@@ -481,15 +482,21 @@ function FocusView({ cards, categories, companies, index, setIndex, onToggleStar
     }
   }
 
-  function handleDragEnd(_e, info) {
-    const { offset, velocity } = info;
-    const swipe = Math.abs(offset.x) * velocity.x;
+  function handleTouchStart(e) {
+    const t = e.touches[0];
+    touchRef.current = { x: t.clientX, y: t.clientY, locked: false };
+  }
 
-    if (offset.x < -SWIPE_THRESHOLD || swipe < -5000) {
-      goTo(true);
-    } else if (offset.x > SWIPE_THRESHOLD || swipe > 5000) {
-      goTo(false);
+  function handleTouchEnd(e) {
+    if (!touchRef.current) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - touchRef.current.x;
+    const dy = t.clientY - touchRef.current.y;
+    if (Math.abs(dx) > Math.abs(dy) * 1.5 && Math.abs(dx) > SWIPE_THRESHOLD) {
+      if (dx < 0) goTo(true);
+      else goTo(false);
     }
+    touchRef.current = null;
   }
 
   return (
@@ -554,12 +561,10 @@ function FocusView({ cards, categories, companies, index, setIndex, onToggleStar
               animate="center"
               exit="exit"
               transition={{ type: "tween", duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
-              drag="x"
-              dragConstraints={{ left: 0, right: 0 }}
-              dragElastic={0.7}
-              onDragEnd={handleDragEnd}
-              className="overflow-y-auto overscroll-contain touch-pan-y"
-              style={{ maxHeight: "calc(100vh - 300px)" }}
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
+              className="overflow-y-auto overscroll-contain"
+              style={{ maxHeight: "calc(100dvh - 300px)" }}
             >
               {/* Question */}
               <div className="p-6 md:p-10">
