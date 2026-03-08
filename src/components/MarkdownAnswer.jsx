@@ -2,7 +2,7 @@ export function MarkdownAnswer({ text }) {
   const lines = text.split("\n");
 
   return (
-    <div className="space-y-2 text-sm md:text-[15px] leading-relaxed text-gray-600">
+    <div className="space-y-2 text-sm md:text-[15px] leading-relaxed text-gray-600 dark:text-zinc-400">
       {lines.map((line, i) => {
         const trimmed = line.trim();
         if (!trimmed) return <div key={i} className="h-2" />;
@@ -12,7 +12,7 @@ export function MarkdownAnswer({ text }) {
           return (
             <h3
               key={i}
-              className="font-bold text-brand-600 text-xs uppercase tracking-wider pt-3 first:pt-0"
+              className="font-bold text-brand-600 dark:text-brand-400 text-xs uppercase tracking-wider pt-3 first:pt-0"
             >
               {label}
             </h3>
@@ -25,7 +25,7 @@ export function MarkdownAnswer({ text }) {
           const rest = trimmed.slice(colonIdx + 3).trim();
           return (
             <p key={i}>
-              <span className="font-bold text-brand-600">{label}:</span>{" "}
+              <span className="font-bold text-brand-600 dark:text-brand-400">{label}:</span>{" "}
               <span>{rest}</span>
             </p>
           );
@@ -34,7 +34,7 @@ export function MarkdownAnswer({ text }) {
         if (trimmed.startsWith("- ")) {
           return (
             <div key={i} className="flex gap-2.5 pl-1">
-              <span className="text-brand-400 mt-1 shrink-0 text-xs">●</span>
+              <span className="text-brand-400 dark:text-brand-500 mt-1 shrink-0 text-xs">●</span>
               <span>{renderInlineBold(trimmed.slice(2))}</span>
             </div>
           );

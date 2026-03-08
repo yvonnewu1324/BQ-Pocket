@@ -17,7 +17,7 @@ export function FlashCard({ card, onToggleStar, onEdit, onDelete, large }) {
         style={{ minHeight: minH }}
       >
         {/* Front - Question */}
-        <div className="card-front absolute inset-0 rounded-2xl bg-white border border-border shadow-sm flex flex-col">
+        <div className="card-front absolute inset-0 rounded-2xl bg-white dark:bg-surface-card border border-border shadow-sm dark:shadow-none flex flex-col">
           <div className="flex items-start justify-between p-5 pb-3">
             {category && (
               <span
@@ -38,7 +38,7 @@ export function FlashCard({ card, onToggleStar, onEdit, onDelete, large }) {
                 className={
                   card.starred
                     ? "fill-amber-400 text-amber-400"
-                    : "text-gray-300 hover:text-amber-300"
+                    : "text-gray-300 hover:text-amber-300 dark:text-zinc-500 dark:hover:text-amber-400"
                 }
               />
             </button>
@@ -61,7 +61,7 @@ export function FlashCard({ card, onToggleStar, onEdit, onDelete, large }) {
                   e.stopPropagation();
                   onEdit(card);
                 }}
-                className="p-2 text-text-muted hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors"
+                className="p-2 text-text-muted hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-500/10 rounded-lg transition-colors"
               >
                 <Edit3 size={15} />
               </button>
@@ -70,7 +70,7 @@ export function FlashCard({ card, onToggleStar, onEdit, onDelete, large }) {
                   e.stopPropagation();
                   onDelete(card.id);
                 }}
-                className="p-2 text-text-muted hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                className="p-2 text-text-muted hover:text-red-600 hover:bg-red-50 dark:hover:text-red-400 dark:hover:bg-red-500/10 rounded-lg transition-colors"
               >
                 <Trash2 size={15} />
               </button>
@@ -79,14 +79,14 @@ export function FlashCard({ card, onToggleStar, onEdit, onDelete, large }) {
         </div>
 
         {/* Back - Answer */}
-        <div className="card-back absolute inset-0 rounded-2xl bg-white border border-brand-200 shadow-sm shadow-brand-100/50 flex flex-col">
+        <div className="card-back absolute inset-0 rounded-2xl bg-white dark:bg-surface-card border border-brand-200 dark:border-brand-500/30 shadow-sm shadow-brand-100/50 dark:shadow-none flex flex-col">
           <div className="flex items-center justify-between p-5 pb-3 border-b border-border">
             <p className="text-sm font-medium text-text-secondary line-clamp-1 pr-4 flex-1">
               {card.question}
             </p>
             <button
               onClick={() => setFlipped(false)}
-              className="p-1.5 text-text-muted hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors shrink-0"
+              className="p-1.5 text-text-muted hover:text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-500/10 rounded-lg transition-colors shrink-0"
             >
               <RotateCcw size={16} />
             </button>

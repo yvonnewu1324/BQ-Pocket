@@ -15,13 +15,33 @@
   --color-brand-600: #4f46e5;
   --color-brand-700: #4338ca;
 
-  --color-surface: #ffffff;
-  --color-surface-dim: #f8f9fc;
-  --color-surface-card: #ffffff;
-  --color-border: #e5e7eb;
-  --color-text-primary: #111827;
-  --color-text-secondary: #4b5563;
-  --color-text-muted: #9ca3af;
+  --color-surface: var(--surface);
+  --color-surface-dim: var(--surface-dim);
+  --color-surface-card: var(--surface-card);
+  --color-border: var(--app-border);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+}
+
+:root {
+  --surface: #ffffff;
+  --surface-dim: #f8f9fc;
+  --surface-card: #ffffff;
+  --app-border: #e5e7eb;
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-muted: #9ca3af;
+}
+
+.dark {
+  --surface: #18181b;
+  --surface-dim: #09090b;
+  --surface-card: #1e1e22;
+  --app-border: #2e2e33;
+  --text-primary: #f4f4f5;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
 }
 
 html {
@@ -41,6 +61,11 @@ body {
   color: var(--color-brand-700);
 }
 
+.dark ::selection {
+  background: var(--color-brand-700);
+  color: var(--color-brand-200);
+}
+
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -56,6 +81,14 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #9ca3af;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #3f3f46;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #52525b;
 }
 
 :root {
