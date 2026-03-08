@@ -287,42 +287,59 @@ function FocusView({ cards, index, setIndex, onToggleStar, onEdit, onDelete }) {
     <div className="pb-8 space-y-4">
       {/* Question card */}
       <div className="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
-        <div className="p-5 md:p-8">
-          <div className="flex items-start justify-between gap-3 mb-5">
-            <div className="flex items-center gap-2 flex-wrap">
-              {category && (
-                <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${category.color}`}>
-                  {category.label}
-                </span>
-              )}
-              <span className="text-xs text-text-muted font-medium tabular-nums">
-                {safeIndex + 1} / {cards.length}
-              </span>
-            </div>
-            <div className="flex items-center gap-1 shrink-0">
-              <button
-                onClick={() => onToggleStar(card.id)}
-                className="p-1.5 hover:scale-110 transition-transform"
-              >
-                <Star
-                  size={18}
-                  className={card.starred ? "fill-amber-400 text-amber-400" : "text-gray-300 hover:text-amber-300"}
-                />
-              </button>
-              <button
-                onClick={() => onEdit(card)}
-                className="p-1.5 text-text-muted hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors"
-              >
-                <Edit3 size={16} />
-              </button>
-              <button
-                onClick={() => onDelete(card.id)}
-                className="p-1.5 text-text-muted hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-              >
-                <Trash2 size={16} />
-              </button>
-            </div>
+        {/* Navigation + actions bar */}
+        <div className="flex items-center justify-between px-4 py-2.5 border-b border-border">
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => onToggleStar(card.id)}
+              className="p-1.5 hover:scale-110 transition-transform"
+            >
+              <Star
+                size={16}
+                className={card.starred ? "fill-amber-400 text-amber-400" : "text-gray-300 hover:text-amber-300"}
+              />
+            </button>
+            <button
+              onClick={() => onEdit(card)}
+              className="p-1.5 text-text-muted hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors"
+            >
+              <Edit3 size={15} />
+            </button>
+            <button
+              onClick={() => onDelete(card.id)}
+              className="p-1.5 text-text-muted hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            >
+              <Trash2 size={15} />
+            </button>
           </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => goTo(false)}
+              disabled={safeIndex === 0}
+              className="p-1.5 text-text-secondary hover:text-brand-600 hover:bg-brand-50 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            >
+              <ChevronLeft size={18} />
+            </button>
+            <span className="text-xs text-text-muted font-medium tabular-nums min-w-[3rem] text-center">
+              {safeIndex + 1} / {cards.length}
+            </span>
+            <button
+              onClick={() => goTo(true)}
+              disabled={safeIndex === cards.length - 1}
+              className="p-1.5 text-text-secondary hover:text-brand-600 hover:bg-brand-50 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            >
+              <ChevronRight size={18} />
+            </button>
+          </div>
+        </div>
+
+        <div className="p-5 md:p-8">
+          {category && (
+            <span className={`inline-block text-xs font-medium px-2.5 py-1 rounded-full mb-4 ${category.color}`}>
+              {category.label}
+            </span>
+          )}
 
           <h2 className="text-xl md:text-2xl font-bold text-text-primary leading-snug">
             {card.question}
@@ -371,25 +388,6 @@ function FocusView({ cards, index, setIndex, onToggleStar, onEdit, onDelete }) {
         </div>
       </div>
 
-      {/* Navigation */}
-      <div className="flex items-center justify-between">
-        <button
-          onClick={() => goTo(false)}
-          disabled={safeIndex === 0}
-          className="flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium text-text-secondary border border-border rounded-xl bg-white hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-        >
-          <ChevronLeft size={16} />
-          Prev
-        </button>
-        <button
-          onClick={() => goTo(true)}
-          disabled={safeIndex === cards.length - 1}
-          className="flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium text-text-secondary border border-border rounded-xl bg-white hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-        >
-          Next
-          <ChevronRight size={16} />
-        </button>
-      </div>
     </div>
   );
 }
