@@ -1,9 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from "react";
-import { Plus, Star, Layers, Shuffle, ChevronRight, ChevronLeft, Edit3, Trash2, Eye, EyeOff } from "lucide-react";
+import { Plus, Star, Layers, Shuffle, ChevronRight, ChevronLeft, Edit3, Trash2, Eye, EyeOff, Building2 } from "lucide-react";
 import { useCards } from "./hooks/useCards";
-import { CATEGORIES } from "./data/sampleCards";
 import { SearchBar } from "./components/SearchBar";
-import { CategoryFilter } from "./components/CategoryFilter";
 import { CardModal } from "./components/CardModal";
 import { CardDetail } from "./components/CardDetail";
 import { EmptyState } from "./components/EmptyState";
@@ -12,23 +10,30 @@ import { MarkdownAnswer } from "./components/MarkdownAnswer";
 function App() {
   const {
     cards,
+    categories,
+    companies,
     searchQuery,
     setSearchQuery,
     activeCategory,
     setActiveCategory,
+    activeCompany,
+    setActiveCompany,
     showStarredOnly,
     setShowStarredOnly,
     categoryCounts,
+    companyCounts,
     addCard,
     updateCard,
     deleteCard,
     toggleStar,
+    addCategory,
+    addCompany,
   } = useCards();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingCard, setEditingCard] = useState(null);
   const [detailIndex, setDetailIndex] = useState(null);
-  const [viewMode, setViewMode] = useState("list"); // "list" | "focus"
+  const [viewMode, setViewMode] = useState("list");
   const [focusIndex, setFocusIndex] = useState(0);
 
   const handleEdit = useCallback((card) => {
@@ -103,7 +108,7 @@ function App() {
       </header>
 
       {/* Main */}
-      <main className="max-w-6xl mx-auto px-4 py-4 space-y-4">
+      <main className="max-w-6xl mx-auto px-4 py-4 space-y-3">
         {/* Search + View Toggle */}
         <div className="flex gap-3 items-center">
           <div className="flex-1">
@@ -136,12 +141,53 @@ function App() {
           </div>
         </div>
 
-        {/* Category Filter */}
-        <CategoryFilter
-          active={activeCategory}
-          onChange={setActiveCategory}
-          counts={categoryCounts}
-        />
+        {/* Filters */}
+        <div className="flex items-center gap-2">
+          <select
+            value={activeCategory}
+            onChange={(e) => setActiveCategory(e.target.value)}
+            className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors appearance-none cursor-pointer pr-7 bg-[length:16px] bg-[right_6px_center] bg-no-repeat ${
+              activeCategory !== "all"
+                ? "bg-brand-600 text-white border-brand-600"
+                : "bg-white border-border text-text-secondary hover:border-brand-300"
+            }`}
+            style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='${activeCategory !== "all" ? "white" : "%2364748b"}' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")` }}
+          >
+            <option value="all">All Categories ({categoryCounts.all})</option>
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.label} ({categoryCounts[cat.id] || 0})
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={activeCompany}
+            onChange={(e) => setActiveCompany(e.target.value)}
+            className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors appearance-none cursor-pointer pr-7 bg-[length:16px] bg-[right_6px_center] bg-no-repeat ${
+              activeCompany !== "all"
+                ? "bg-brand-600 text-white border-brand-600"
+                : "bg-white border-border text-text-secondary hover:border-brand-300"
+            }`}
+            style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='${activeCompany !== "all" ? "white" : "%2364748b"}' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")` }}
+          >
+            <option value="all">All Companies ({companyCounts.all})</option>
+            {companies.map((co) => (
+              <option key={co.id} value={co.id}>
+                {co.label} ({companyCounts[co.id] || 0})
+              </option>
+            ))}
+          </select>
+
+          {(activeCategory !== "all" || activeCompany !== "all") && (
+            <button
+              onClick={() => { setActiveCategory("all"); setActiveCompany("all"); }}
+              className="text-xs text-text-muted hover:text-brand-600 transition-colors whitespace-nowrap"
+            >
+              Clear
+            </button>
+          )}
+        </div>
 
         {/* Card Count */}
         <div className="flex items-center justify-between">
@@ -163,17 +209,19 @@ function App() {
         {/* Cards */}
         {cards.length === 0 ? (
           <EmptyState
-            hasSearch={!!searchQuery || activeCategory !== "all" || showStarredOnly}
+            hasSearch={!!searchQuery || activeCategory !== "all" || activeCompany !== "all" || showStarredOnly}
             onClearSearch={() => {
               setSearchQuery("");
               setActiveCategory("all");
+              setActiveCompany("all");
               setShowStarredOnly(false);
             }}
           />
         ) : viewMode === "list" ? (
           <div className="bg-white rounded-2xl border border-border divide-y divide-border overflow-hidden pb-0 mb-8">
             {cards.map((card, idx) => {
-              const category = CATEGORIES.find((c) => c.id === card.category);
+              const category = categories.find((c) => c.id === card.category);
+              const company = companies.find((c) => c.id === card.company);
               return (
                 <button
                   key={card.id}
@@ -200,13 +248,19 @@ function App() {
                     <p className="text-sm font-medium text-text-primary truncate">
                       {card.question}
                     </p>
-                    {category && (
-                      <span
-                        className={`inline-block text-[11px] font-medium px-2 py-0.5 rounded-full mt-1 ${category.color}`}
-                      >
-                        {category.label}
-                      </span>
-                    )}
+                    <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                      {category && (
+                        <span className={`inline-block text-[11px] font-medium px-2 py-0.5 rounded-full ${category.color}`}>
+                          {category.label}
+                        </span>
+                      )}
+                      {company && (
+                        <span className="inline-flex items-center gap-0.5 text-[11px] font-medium px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                          <Building2 size={10} />
+                          {company.label}
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <ChevronRight
                     size={16}
@@ -219,6 +273,8 @@ function App() {
         ) : (
           <FocusView
             cards={cards}
+            categories={categories}
+            companies={companies}
             index={focusIndex}
             setIndex={setFocusIndex}
             onToggleStar={toggleStar}
@@ -232,6 +288,10 @@ function App() {
       {modalOpen && (
         <CardModal
           card={editingCard}
+          categories={categories}
+          companies={companies}
+          onAddCategory={addCategory}
+          onAddCompany={addCompany}
           onSave={handleSave}
           onClose={() => {
             setModalOpen(false);
@@ -243,6 +303,8 @@ function App() {
       {detailCard && (
         <CardDetail
           card={detailCard}
+          categories={categories}
+          companies={companies}
           currentIndex={detailIndex}
           totalCount={cards.length}
           onClose={() => setDetailIndex(null)}
@@ -262,7 +324,7 @@ function App() {
   );
 }
 
-function FocusView({ cards, index, setIndex, onToggleStar, onEdit, onDelete }) {
+function FocusView({ cards, categories, companies, index, setIndex, onToggleStar, onEdit, onDelete }) {
   const [revealedIds, setRevealedIds] = useState(new Set());
   const [animating, setAnimating] = useState(false);
   const answerRef = useRef(null);
@@ -286,7 +348,8 @@ function FocusView({ cards, index, setIndex, onToggleStar, onEdit, onDelete }) {
     setTimeout(() => setAnimating(false), 500);
   }
 
-  const category = CATEGORIES.find((c) => c.id === card?.category);
+  const category = categories.find((c) => c.id === card?.category);
+  const company = companies.find((c) => c.id === card?.company);
   if (!card) return null;
 
   function goTo(next) {
@@ -347,11 +410,19 @@ function FocusView({ cards, index, setIndex, onToggleStar, onEdit, onDelete }) {
         </div>
 
         <div className="p-5 md:p-8">
-          {category && (
-            <span className={`inline-block text-xs font-medium px-2.5 py-1 rounded-full mb-4 ${category.color}`}>
-              {category.label}
-            </span>
-          )}
+          <div className="flex items-center gap-2 flex-wrap mb-4">
+            {category && (
+              <span className={`inline-block text-xs font-medium px-2.5 py-1 rounded-full ${category.color}`}>
+                {category.label}
+              </span>
+            )}
+            {company && (
+              <span className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full bg-slate-100 text-slate-600">
+                <Building2 size={11} />
+                {company.label}
+              </span>
+            )}
+          </div>
 
           <h2 className="text-xl md:text-2xl font-bold text-text-primary leading-snug">
             {card.question}

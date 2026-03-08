@@ -1,23 +1,29 @@
 import { useState, useEffect } from "react";
-import { X } from "lucide-react";
-import { CATEGORIES } from "../data/sampleCards";
+import { X, Plus } from "lucide-react";
 
-export function CardModal({ card, onSave, onClose }) {
+export function CardModal({ card, categories, companies, onAddCategory, onAddCompany, onSave, onClose }) {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
-  const [category, setCategory] = useState("leadership");
+  const [category, setCategory] = useState("");
+  const [company, setCompany] = useState("");
+  const [newCategory, setNewCategory] = useState("");
+  const [newCompany, setNewCompany] = useState("");
+  const [showNewCategory, setShowNewCategory] = useState(false);
+  const [showNewCompany, setShowNewCompany] = useState(false);
 
   useEffect(() => {
     if (card) {
       setQuestion(card.question);
       setAnswer(card.answer);
       setCategory(card.category);
+      setCompany(card.company || "");
     } else {
       setQuestion("");
       setAnswer("");
-      setCategory("leadership");
+      setCategory(categories[0]?.id || "");
+      setCompany("");
     }
-  }, [card]);
+  }, [card, categories]);
 
   useEffect(() => {
     function handleEsc(e) {
@@ -27,6 +33,24 @@ export function CardModal({ card, onSave, onClose }) {
     return () => document.removeEventListener("keydown", handleEsc);
   }, [onClose]);
 
+  function handleAddCategory() {
+    const label = newCategory.trim();
+    if (!label) return;
+    const cat = onAddCategory(label);
+    setCategory(cat.id);
+    setNewCategory("");
+    setShowNewCategory(false);
+  }
+
+  function handleAddCompany() {
+    const label = newCompany.trim();
+    if (!label) return;
+    const co = onAddCompany(label);
+    setCompany(co.id);
+    setNewCompany("");
+    setShowNewCompany(false);
+  }
+
   function handleSubmit(e) {
     e.preventDefault();
     if (!question.trim() || !answer.trim()) return;
@@ -35,6 +59,7 @@ export function CardModal({ card, onSave, onClose }) {
       question: question.trim(),
       answer: answer.trim(),
       category,
+      company,
       starred: card?.starred || false,
     });
   }
@@ -63,21 +88,115 @@ export function CardModal({ card, onSave, onClose }) {
         </div>
 
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-5 md:p-6 space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-text-secondary mb-1.5">
-              Category
-            </label>
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="w-full px-3 py-2.5 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-200 focus:border-brand-400"
-            >
-              {CATEGORIES.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.label}
-                </option>
-              ))}
-            </select>
+          {/* Category + Company row */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-text-secondary mb-1.5">
+                Category
+              </label>
+              {showNewCategory ? (
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newCategory}
+                    onChange={(e) => setNewCategory(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleAddCategory())}
+                    placeholder="New category name"
+                    autoFocus
+                    className="flex-1 px-3 py-2.5 border border-brand-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-200"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddCategory}
+                    className="px-3 py-2.5 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 transition-colors"
+                  >
+                    Add
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setShowNewCategory(false); setNewCategory(""); }}
+                    className="px-2 py-2.5 text-text-muted hover:text-text-secondary text-sm"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <select
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    className="flex-1 px-3 py-2.5 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-200 focus:border-brand-400"
+                  >
+                    {categories.map((cat) => (
+                      <option key={cat.id} value={cat.id}>{cat.label}</option>
+                    ))}
+                  </select>
+                  <button
+                    type="button"
+                    onClick={() => setShowNewCategory(true)}
+                    className="shrink-0 p-2.5 border border-dashed border-brand-300 text-brand-500 rounded-xl hover:bg-brand-50 transition-colors"
+                    title="Add new category"
+                  >
+                    <Plus size={16} />
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-text-secondary mb-1.5">
+                Company
+                <span className="font-normal text-text-muted ml-1">(optional)</span>
+              </label>
+              {showNewCompany ? (
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newCompany}
+                    onChange={(e) => setNewCompany(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleAddCompany())}
+                    placeholder="New company name"
+                    autoFocus
+                    className="flex-1 px-3 py-2.5 border border-brand-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-200"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddCompany}
+                    className="px-3 py-2.5 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 transition-colors"
+                  >
+                    Add
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setShowNewCompany(false); setNewCompany(""); }}
+                    className="px-2 py-2.5 text-text-muted hover:text-text-secondary text-sm"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <select
+                    value={company}
+                    onChange={(e) => setCompany(e.target.value)}
+                    className="flex-1 px-3 py-2.5 bg-white border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-200 focus:border-brand-400"
+                  >
+                    <option value="">None</option>
+                    {companies.map((co) => (
+                      <option key={co.id} value={co.id}>{co.label}</option>
+                    ))}
+                  </select>
+                  <button
+                    type="button"
+                    onClick={() => setShowNewCompany(true)}
+                    className="shrink-0 p-2.5 border border-dashed border-brand-300 text-brand-500 rounded-xl hover:bg-brand-50 transition-colors"
+                    title="Add new company"
+                  >
+                    <Plus size={16} />
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
 
           <div>

@@ -1,4 +1,23 @@
-export const CATEGORIES = [
+export const CATEGORY_COLORS = [
+  "bg-purple-100 text-purple-700",
+  "bg-blue-100 text-blue-700",
+  "bg-red-100 text-red-700",
+  "bg-amber-100 text-amber-700",
+  "bg-green-100 text-green-700",
+  "bg-teal-100 text-teal-700",
+  "bg-indigo-100 text-indigo-700",
+  "bg-rose-100 text-rose-700",
+  "bg-cyan-100 text-cyan-700",
+  "bg-orange-100 text-orange-700",
+  "bg-lime-100 text-lime-700",
+  "bg-fuchsia-100 text-fuchsia-700",
+  "bg-sky-100 text-sky-700",
+  "bg-emerald-100 text-emerald-700",
+  "bg-violet-100 text-violet-700",
+  "bg-pink-100 text-pink-700",
+];
+
+export const DEFAULT_CATEGORIES = [
   { id: "leadership", label: "Leadership", color: "bg-purple-100 text-purple-700" },
   { id: "teamwork", label: "Teamwork", color: "bg-blue-100 text-blue-700" },
   { id: "conflict", label: "Conflict Resolution", color: "bg-red-100 text-red-700" },
@@ -7,6 +26,14 @@ export const CATEGORIES = [
   { id: "adaptability", label: "Adaptability", color: "bg-teal-100 text-teal-700" },
   { id: "time-management", label: "Time Management", color: "bg-indigo-100 text-indigo-700" },
   { id: "failure", label: "Failure & Growth", color: "bg-rose-100 text-rose-700" },
+];
+
+export const DEFAULT_COMPANIES = [
+  { id: "google", label: "Google", color: "bg-sky-100 text-sky-700" },
+  { id: "amazon", label: "Amazon", color: "bg-orange-100 text-orange-700" },
+  { id: "meta", label: "Meta", color: "bg-blue-100 text-blue-700" },
+  { id: "apple", label: "Apple", color: "bg-gray-100 text-gray-700" },
+  { id: "microsoft", label: "Microsoft", color: "bg-cyan-100 text-cyan-700" },
 ];
 
 export const sampleCards = [
@@ -26,6 +53,7 @@ export const sampleCards = [
 
 **Result:** We delivered 1 week early with zero downtime. Team satisfaction scores went from 3.2 to 4.5/5. The approach became our template for future migrations.`,
     category: "leadership",
+    company: "amazon",
     starred: true,
   },
   {
@@ -44,6 +72,7 @@ export const sampleCards = [
 
 **Result:** The hybrid approach satisfied both concerns. Response time was 40% faster for mobile. We built a stronger working relationship and started doing architecture reviews together regularly.`,
     category: "conflict",
+    company: "google",
     starred: false,
   },
   {
@@ -62,6 +91,7 @@ export const sampleCards = [
 
 **Result:** The 3 safeguards were adopted org-wide. We haven't had a similar caching incident since. My manager noted that how I handled the failure actually increased trust in me across the team.`,
     category: "failure",
+    company: "meta",
     starred: true,
   },
   {
@@ -79,6 +109,7 @@ export const sampleCards = [
 
 **Result:** The CLI tool had 80% adoption within the first month. The phased approach kept stakeholders happy and gave us time to build the platform right. I was recognized in the quarterly review for smooth transition leadership.`,
     category: "adaptability",
+    company: "",
     starred: false,
   },
   {
@@ -97,6 +128,7 @@ export const sampleCards = [
 
 **Result:** Bug was fixed in 2 days (down from estimated 5). Client feature shipped on time. New hire completed their first PR in week 1 and said the onboarding was the best they'd experienced.`,
     category: "time-management",
+    company: "amazon",
     starred: true,
   },
   {
@@ -115,6 +147,7 @@ export const sampleCards = [
 
 **Result:** Got unanimous approval in the first meeting — a first for engineering proposals. The CFO later said it was the clearest technical proposal she'd reviewed. The migration saved $200K/year in downtime costs.`,
     category: "communication",
+    company: "microsoft",
     starred: false,
   },
   {
@@ -133,6 +166,7 @@ export const sampleCards = [
 
 **Result:** Within 6 weeks, they were completing tasks independently and ahead of schedule. They eventually became the go-to person for our testing framework. The Slack channel became one of the most active channels on the team.`,
     category: "teamwork",
+    company: "google",
     starred: true,
   },
   {
@@ -151,6 +185,7 @@ export const sampleCards = [
 
 **Result:** Response times dropped 60% immediately. Prevented what would have become a P1 incident within 2 weeks based on the growth trend. The trend-based alerting caught 2 more issues in the following quarter before they became problems.`,
     category: "problem-solving",
+    company: "",
     starred: false,
   },
 ];

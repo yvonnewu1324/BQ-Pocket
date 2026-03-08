@@ -1,9 +1,10 @@
-import { X, Star, Edit3, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
-import { CATEGORIES } from "../data/sampleCards";
+import { X, Star, Edit3, Trash2, ChevronLeft, ChevronRight, Building2 } from "lucide-react";
 import { MarkdownAnswer } from "./MarkdownAnswer";
 
 export function CardDetail({
   card,
+  categories,
+  companies,
   onClose,
   onToggleStar,
   onEdit,
@@ -13,7 +14,8 @@ export function CardDetail({
   currentIndex,
   totalCount,
 }) {
-  const category = CATEGORIES.find((c) => c.id === card.category);
+  const category = categories.find((c) => c.id === card.category);
+  const company = companies.find((c) => c.id === card.company);
 
   return (
     <div className="fixed inset-0 z-50 bg-white md:bg-black/40 md:backdrop-blur-sm md:flex md:items-center md:justify-center md:p-4">
@@ -66,13 +68,19 @@ export function CardDetail({
         {/* Content */}
         <div className="flex-1 overflow-y-auto">
           <div className="p-5 md:p-6">
-            {category && (
-              <span
-                className={`inline-block text-xs font-medium px-2.5 py-1 rounded-full mb-3 ${category.color}`}
-              >
-                {category.label}
-              </span>
-            )}
+            <div className="flex items-center gap-2 flex-wrap mb-3">
+              {category && (
+                <span className={`inline-block text-xs font-medium px-2.5 py-1 rounded-full ${category.color}`}>
+                  {category.label}
+                </span>
+              )}
+              {company && (
+                <span className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full bg-slate-100 text-slate-600">
+                  <Building2 size={11} />
+                  {company.label}
+                </span>
+              )}
+            </div>
             <h2 className="text-xl md:text-2xl font-bold text-text-primary leading-snug mb-6">
               {card.question}
             </h2>
