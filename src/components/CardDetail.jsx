@@ -18,7 +18,10 @@ export function CardDetail({
   const company = companies.find((c) => c.id === card.company);
 
   return (
-    <div className="fixed inset-0 z-50 bg-white md:bg-black/50 md:backdrop-blur-sm md:flex md:items-center md:justify-center md:p-6">
+    <div
+      className="fixed inset-0 z-50 bg-white md:bg-black/50 md:backdrop-blur-sm md:flex md:items-center md:justify-center md:p-6"
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
       <div className="h-full md:h-auto md:max-h-[90vh] md:w-full md:max-w-2xl md:rounded-xl bg-white md:shadow-2xl flex flex-col overflow-hidden">
         {/* Header */}
         <div className="shrink-0 flex items-center justify-between px-4 py-3 bg-gray-50/80 border-b border-border/50">
@@ -50,7 +53,7 @@ export function CardDetail({
               <Edit3 size={15} />
             </button>
             <button
-              onClick={() => { onDelete(card.id); onClose(); }}
+              onClick={() => onDelete(card.id)}
               className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-white rounded-md transition-all"
             >
               <Trash2 size={15} />
@@ -63,12 +66,12 @@ export function CardDetail({
           <div className="p-5 md:p-8">
             <div className="flex items-center gap-2 flex-wrap mb-4">
               {category && (
-                <span className={`text-[11px] font-semibold px-2.5 py-1 rounded ${category.color}`}>
+                <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full ${category.color}`}>
                   {category.label}
                 </span>
               )}
               {company && (
-                <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded bg-slate-100 text-slate-500">
+                <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-500">
                   <Building2 size={10} />
                   {company.label}
                 </span>
