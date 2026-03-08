@@ -98,9 +98,9 @@ function App() {
   const hasActiveFilters = activeCategory !== "all" || activeCompany !== "all" || showStarredOnly;
 
   return (
-    <div className="min-h-screen bg-surface-dim">
+    <div className="h-screen flex flex-col bg-surface-dim overflow-hidden">
       {/* Header */}
-      <header className="sticky top-0 z-30 bg-white dark:bg-surface border-b border-border/60 shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-none">
+      <header className="shrink-0 z-30 bg-white dark:bg-surface border-b border-border/60 shadow-[0_1px_3px_rgba(0,0,0,0.04)] dark:shadow-none">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-14">
             <div className="flex items-center gap-3">
@@ -148,108 +148,112 @@ function App() {
         </div>
       </header>
 
-      {/* Main */}
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-5 space-y-4">
-        {/* Toolbar */}
-        <div className="flex gap-2 items-center">
-          <div className="flex-1">
-            <SearchBar value={searchQuery} onChange={setSearchQuery} />
+      {/* Toolbar + Filters (fixed) */}
+      <div className="shrink-0 bg-surface-dim z-20">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-5 pb-2 space-y-3">
+          <div className="flex gap-2 items-center">
+            <div className="flex-1">
+              <SearchBar value={searchQuery} onChange={setSearchQuery} />
+            </div>
+            <div className="flex bg-white dark:bg-surface-card border border-border rounded-lg overflow-hidden shrink-0 shadow-sm dark:shadow-none">
+              <button
+                onClick={() => setViewMode("list")}
+                className={`flex items-center gap-1 px-2.5 py-2 text-xs font-semibold transition-all ${
+                  viewMode === "list"
+                    ? "bg-brand-600 text-white"
+                    : "text-gray-500 hover:bg-gray-50 dark:text-zinc-400 dark:hover:bg-zinc-800"
+                }`}
+              >
+                <List size={13} />
+                List
+              </button>
+              <button
+                onClick={() => {
+                  setViewMode("focus");
+                  setFocusIndex(0);
+                }}
+                className={`flex items-center gap-1 px-2.5 py-2 text-xs font-semibold transition-all ${
+                  viewMode === "focus"
+                    ? "bg-brand-600 text-white"
+                    : "text-gray-500 hover:bg-gray-50 dark:text-zinc-400 dark:hover:bg-zinc-800"
+                }`}
+              >
+                <Zap size={13} />
+                Focus
+              </button>
+            </div>
           </div>
-          <div className="flex bg-white dark:bg-surface-card border border-border rounded-lg overflow-hidden shrink-0 shadow-sm dark:shadow-none">
-            <button
-              onClick={() => setViewMode("list")}
-              className={`flex items-center gap-1 px-2.5 py-2 text-xs font-semibold transition-all ${
-                viewMode === "list"
-                  ? "bg-brand-600 text-white"
-                  : "text-gray-500 hover:bg-gray-50 dark:text-zinc-400 dark:hover:bg-zinc-800"
-              }`}
-            >
-              <List size={13} />
-              List
-            </button>
-            <button
-              onClick={() => {
-                setViewMode("focus");
-                setFocusIndex(0);
-              }}
-              className={`flex items-center gap-1 px-2.5 py-2 text-xs font-semibold transition-all ${
-                viewMode === "focus"
-                  ? "bg-brand-600 text-white"
-                  : "text-gray-500 hover:bg-gray-50 dark:text-zinc-400 dark:hover:bg-zinc-800"
-              }`}
-            >
-              <Zap size={13} />
-              Focus
-            </button>
+
+          <div className="flex items-center gap-2 flex-wrap">
+            <Filter size={13} className="text-gray-400 dark:text-zinc-500" />
+            <Select value={activeCategory} onValueChange={setActiveCategory}>
+              <SelectTrigger className={`text-xs font-semibold ${
+                activeCategory !== "all"
+                  ? "bg-brand-600 text-white border-brand-600 shadow-sm shadow-brand-200 dark:shadow-none [&_svg]:text-white"
+                  : "bg-white dark:bg-surface-card border-border text-gray-600 dark:text-zinc-400 hover:border-gray-300 dark:hover:border-zinc-600"
+              }`}>
+                <SelectValue placeholder="Category: All" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Category: All</SelectItem>
+                {categories.map((cat) => (
+                  <SelectItem key={cat.id} value={cat.id}>
+                    {cat.label} ({categoryCounts[cat.id] || 0})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={activeCompany} onValueChange={setActiveCompany}>
+              <SelectTrigger className={`text-xs font-semibold ${
+                activeCompany !== "all"
+                  ? "bg-brand-600 text-white border-brand-600 shadow-sm shadow-brand-200 dark:shadow-none [&_svg]:text-white"
+                  : "bg-white dark:bg-surface-card border-border text-gray-600 dark:text-zinc-400 hover:border-gray-300 dark:hover:border-zinc-600"
+              }`}>
+                <SelectValue placeholder="Company: All" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Company: All</SelectItem>
+                {companies.map((co) => (
+                  <SelectItem key={co.id} value={co.id}>
+                    {co.label} ({companyCounts[co.id] || 0})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {hasActiveFilters && (
+              <button
+                onClick={() => { setActiveCategory("all"); setActiveCompany("all"); setShowStarredOnly(false); }}
+                className="flex items-center gap-1 text-xs font-medium text-gray-400 hover:text-brand-600 dark:text-zinc-500 dark:hover:text-brand-400 transition-colors"
+              >
+                <X size={12} />
+                Reset
+              </button>
+            )}
+
+            <div className="flex-1" />
+
+            <span className="text-xs text-gray-400 dark:text-zinc-500 font-medium tabular-nums">
+              {cards.length} card{cards.length !== 1 ? "s" : ""}
+            </span>
+
+            {viewMode === "focus" && cards.length > 1 && (
+              <button
+                onClick={handleShuffle}
+                className="flex items-center gap-1 text-xs font-semibold text-gray-400 hover:text-brand-600 dark:text-zinc-500 dark:hover:text-brand-400 transition-colors"
+              >
+                <Shuffle size={12} />
+                Shuffle
+              </button>
+            )}
           </div>
         </div>
+      </div>
 
-        {/* Filters Row */}
-        <div className="flex items-center gap-2 flex-wrap">
-          <Filter size={13} className="text-gray-400 dark:text-zinc-500" />
-          <Select value={activeCategory} onValueChange={setActiveCategory}>
-            <SelectTrigger className={`text-xs font-semibold ${
-              activeCategory !== "all"
-                ? "bg-brand-600 text-white border-brand-600 shadow-sm shadow-brand-200 dark:shadow-none [&_svg]:text-white"
-                : "bg-white dark:bg-surface-card border-border text-gray-600 dark:text-zinc-400 hover:border-gray-300 dark:hover:border-zinc-600"
-            }`}>
-              <SelectValue placeholder="Category: All" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Category: All</SelectItem>
-              {categories.map((cat) => (
-                <SelectItem key={cat.id} value={cat.id}>
-                  {cat.label} ({categoryCounts[cat.id] || 0})
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Select value={activeCompany} onValueChange={setActiveCompany}>
-            <SelectTrigger className={`text-xs font-semibold ${
-              activeCompany !== "all"
-                ? "bg-brand-600 text-white border-brand-600 shadow-sm shadow-brand-200 dark:shadow-none [&_svg]:text-white"
-                : "bg-white dark:bg-surface-card border-border text-gray-600 dark:text-zinc-400 hover:border-gray-300 dark:hover:border-zinc-600"
-            }`}>
-              <SelectValue placeholder="Company: All" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Company: All</SelectItem>
-              {companies.map((co) => (
-                <SelectItem key={co.id} value={co.id}>
-                  {co.label} ({companyCounts[co.id] || 0})
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          {hasActiveFilters && (
-            <button
-              onClick={() => { setActiveCategory("all"); setActiveCompany("all"); setShowStarredOnly(false); }}
-              className="flex items-center gap-1 text-xs font-medium text-gray-400 hover:text-brand-600 dark:text-zinc-500 dark:hover:text-brand-400 transition-colors"
-            >
-              <X size={12} />
-              Reset
-            </button>
-          )}
-
-          <div className="flex-1" />
-
-          <span className="text-xs text-gray-400 dark:text-zinc-500 font-medium tabular-nums">
-            {cards.length} card{cards.length !== 1 ? "s" : ""}
-          </span>
-
-          {viewMode === "focus" && cards.length > 1 && (
-            <button
-              onClick={handleShuffle}
-              className="flex items-center gap-1 text-xs font-semibold text-gray-400 hover:text-brand-600 dark:text-zinc-500 dark:hover:text-brand-400 transition-colors"
-            >
-              <Shuffle size={12} />
-              Shuffle
-            </button>
-          )}
-        </div>
-
+      {/* Scrollable content */}
+      <main className="flex-1 min-h-0 overflow-y-auto overscroll-contain">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3">
         {/* Cards */}
         {cards.length === 0 ? (
           <EmptyState
@@ -365,6 +369,7 @@ function App() {
             onDelete={requestDelete}
           />
         )}
+        </div>
       </main>
 
       {/* Modals */}
@@ -435,12 +440,12 @@ function FocusView({ cards, categories, companies, index, setIndex, onToggleStar
   const [revealedIds, setRevealedIds] = useState(new Set());
   const [animating, setAnimating] = useState(false);
   const [direction, setDirection] = useState(0);
-  const answerRef = useRef(null);
+  const scrollRef = useRef(null);
   const safeIndex = Math.min(index, cards.length - 1);
   const card = cards[safeIndex];
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (scrollRef.current) scrollRef.current.scrollTop = 0;
   }, [safeIndex]);
 
   const revealed = card ? revealedIds.has(card.id) : false;
@@ -488,10 +493,10 @@ function FocusView({ cards, categories, companies, index, setIndex, onToggleStar
   }
 
   return (
-    <div className="pb-8">
+    <div>
       <div className="bg-white dark:bg-surface-card rounded-xl border border-border/60 shadow-sm dark:shadow-none overflow-hidden">
         {/* Top bar */}
-        <div className="flex items-center justify-between px-4 py-2.5 bg-gray-50/80 dark:bg-zinc-800/50 border-b border-border/50">
+        <div className="shrink-0 flex items-center justify-between px-4 py-2.5 bg-gray-50/80 dark:bg-zinc-800/50 border-b border-border/50">
           <div className="flex items-center gap-1">
             <button
               onClick={() => onToggleStar(card.id)}
@@ -537,11 +542,12 @@ function FocusView({ cards, categories, companies, index, setIndex, onToggleStar
           </div>
         </div>
 
-        {/* Swipeable content */}
+        {/* Swipeable content — scrolls internally */}
         <div className="overflow-hidden relative">
           <AnimatePresence initial={false} custom={direction} mode="popLayout">
             <motion.div
               key={card.id}
+              ref={scrollRef}
               custom={direction}
               variants={swipeVariants}
               initial="enter"
@@ -552,7 +558,8 @@ function FocusView({ cards, categories, companies, index, setIndex, onToggleStar
               dragConstraints={{ left: 0, right: 0 }}
               dragElastic={0.7}
               onDragEnd={handleDragEnd}
-              className="touch-pan-y"
+              className="overflow-y-auto overscroll-contain touch-pan-y"
+              style={{ maxHeight: "calc(100vh - 300px)" }}
             >
               {/* Question */}
               <div className="p-6 md:p-10">
@@ -578,12 +585,7 @@ function FocusView({ cards, categories, companies, index, setIndex, onToggleStar
               {/* Reveal */}
               {!revealed && (
                 <button
-                  onClick={() => {
-                    toggleRevealed(true);
-                    setTimeout(() => {
-                      answerRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-                    }, 100);
-                  }}
+                  onClick={() => toggleRevealed(true)}
                   className="w-full flex items-center justify-center gap-2 px-5 py-4 bg-gradient-to-r from-brand-50 to-indigo-50 hover:from-brand-100 hover:to-indigo-100 dark:from-brand-500/10 dark:to-indigo-500/10 dark:hover:from-brand-500/20 dark:hover:to-indigo-500/20 border-t border-brand-100 dark:border-brand-500/20 text-brand-600 dark:text-brand-400 font-semibold text-sm transition-all"
                 >
                   <Eye size={15} />
@@ -594,7 +596,6 @@ function FocusView({ cards, categories, companies, index, setIndex, onToggleStar
               {/* Answer */}
               {revealed && (
                 <div
-                  ref={answerRef}
                   className={animating ? "overflow-hidden transition-all duration-500 ease-out" : ""}
                   style={animating ? { maxHeight: "5000px", opacity: 1 } : undefined}
                 >
@@ -605,7 +606,7 @@ function FocusView({ cards, categories, companies, index, setIndex, onToggleStar
                   <button
                     onClick={() => {
                       toggleRevealed(false);
-                      window.scrollTo({ top: 0, behavior: "smooth" });
+                      if (scrollRef.current) scrollRef.current.scrollTop = 0;
                     }}
                     className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-gray-50 hover:bg-gray-100 dark:bg-zinc-800/50 dark:hover:bg-zinc-800 border-t border-border/50 text-gray-400 dark:text-zinc-500 font-semibold text-xs transition-all"
                   >
