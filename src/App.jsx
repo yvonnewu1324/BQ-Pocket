@@ -263,15 +263,28 @@ function App() {
 }
 
 function FocusView({ cards, index, setIndex, onToggleStar, onEdit, onDelete }) {
-  const [revealed, setRevealed] = useState(false);
+  const [revealedIds, setRevealedIds] = useState(new Set());
+  const [animating, setAnimating] = useState(false);
   const answerRef = useRef(null);
   const safeIndex = Math.min(index, cards.length - 1);
   const card = cards[safeIndex];
 
   useEffect(() => {
-    setRevealed(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [safeIndex]);
+
+  const revealed = card ? revealedIds.has(card.id) : false;
+
+  function toggleRevealed(show) {
+    setAnimating(true);
+    setRevealedIds((prev) => {
+      const next = new Set(prev);
+      if (show) next.add(card.id);
+      else next.delete(card.id);
+      return next;
+    });
+    setTimeout(() => setAnimating(false), 500);
+  }
 
   const category = CATEGORIES.find((c) => c.id === card?.category);
   if (!card) return null;
@@ -285,7 +298,6 @@ function FocusView({ cards, index, setIndex, onToggleStar, onEdit, onDelete }) {
 
   return (
     <div className="pb-8 space-y-4">
-      {/* Question card */}
       <div className="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
         {/* Navigation + actions bar */}
         <div className="flex items-center justify-between px-4 py-2.5 border-b border-border">
@@ -350,7 +362,7 @@ function FocusView({ cards, index, setIndex, onToggleStar, onEdit, onDelete }) {
         {!revealed && (
           <button
             onClick={() => {
-              setRevealed(true);
+              toggleRevealed(true);
               setTimeout(() => {
                 answerRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
               }, 100);
@@ -363,31 +375,29 @@ function FocusView({ cards, index, setIndex, onToggleStar, onEdit, onDelete }) {
         )}
 
         {/* Answer section */}
-        <div
-          ref={answerRef}
-          className="overflow-hidden transition-all duration-500 ease-out"
-          style={{
-            maxHeight: revealed ? "5000px" : "0px",
-            opacity: revealed ? 1 : 0,
-          }}
-        >
-          <div className="border-t border-border px-5 md:px-8 py-6 md:py-8">
-            <MarkdownAnswer text={card.answer} />
-          </div>
-
-          <button
-            onClick={() => {
-              setRevealed(false);
-              window.scrollTo({ top: 0, behavior: "smooth" });
-            }}
-            className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-gray-50 hover:bg-gray-100 border-t border-border text-text-muted font-medium text-sm transition-colors"
+        {revealed && (
+          <div
+            ref={answerRef}
+            className={animating ? "overflow-hidden transition-all duration-500 ease-out" : ""}
+            style={animating ? { maxHeight: "5000px", opacity: 1 } : undefined}
           >
-            <EyeOff size={14} />
-            Hide Answer
-          </button>
-        </div>
-      </div>
+            <div className="border-t border-border px-5 md:px-8 py-6 md:py-8">
+              <MarkdownAnswer text={card.answer} />
+            </div>
 
+            <button
+              onClick={() => {
+                toggleRevealed(false);
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
+              className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-gray-50 hover:bg-gray-100 border-t border-border text-text-muted font-medium text-sm transition-colors"
+            >
+              <EyeOff size={14} />
+              Hide Answer
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
