@@ -223,10 +223,13 @@ function App() {
               const category = categories.find((c) => c.id === card.category);
               const company = companies.find((c) => c.id === card.company);
               return (
-                <button
+                <div
                   key={card.id}
+                  role="button"
+                  tabIndex={0}
                   onClick={() => setDetailIndex(idx)}
-                  className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-surface-dim transition-colors group"
+                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setDetailIndex(idx); }}
+                  className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-surface-dim transition-colors group cursor-pointer"
                 >
                   <button
                     onClick={(e) => {
@@ -266,7 +269,7 @@ function App() {
                     size={16}
                     className="shrink-0 text-text-muted group-hover:text-brand-500 transition-colors"
                   />
-                </button>
+                </div>
               );
             })}
           </div>
