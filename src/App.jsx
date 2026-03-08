@@ -252,7 +252,7 @@ function App() {
       </div>
 
       {/* Scrollable content */}
-      <main className="flex-1 min-h-0 overflow-y-auto overscroll-contain">
+      <main className={`flex-1 min-h-0 overscroll-contain ${viewMode === "focus" && cards.length > 0 ? "overflow-hidden" : "overflow-y-auto"}`}>
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3">
         {/* Cards */}
         {cards.length === 0 ? (
