@@ -426,7 +426,9 @@ function App() {
 function FocusView({ cards, categories, companies, index, setIndex, onToggleStar, onEdit, onDelete }) {
   const [revealedIds, setRevealedIds] = useState(new Set());
   const [animating, setAnimating] = useState(false);
+  const [swipeOffset, setSwipeOffset] = useState(0);
   const answerRef = useRef(null);
+  const touchRef = useRef({ startX: 0, startY: 0, swiping: false });
   const safeIndex = Math.min(index, cards.length - 1);
   const card = cards[safeIndex];
 
@@ -458,9 +460,52 @@ function FocusView({ cards, categories, companies, index, setIndex, onToggleStar
     setIndex(target);
   }
 
+  const SWIPE_THRESHOLD = 60;
+
+  function handleTouchStart(e) {
+    const t = e.touches[0];
+    touchRef.current = { startX: t.clientX, startY: t.clientY, swiping: false };
+  }
+
+  function handleTouchMove(e) {
+    const t = e.touches[0];
+    const dx = t.clientX - touchRef.current.startX;
+    const dy = t.clientY - touchRef.current.startY;
+    if (!touchRef.current.swiping && Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+      touchRef.current.swiping = true;
+    }
+    if (touchRef.current.swiping) {
+      const atStart = safeIndex === 0 && dx > 0;
+      const atEnd = safeIndex === cards.length - 1 && dx < 0;
+      setSwipeOffset(atStart || atEnd ? dx * 0.2 : dx);
+    }
+  }
+
+  function handleTouchEnd() {
+    if (touchRef.current.swiping) {
+      if (swipeOffset < -SWIPE_THRESHOLD && safeIndex < cards.length - 1) {
+        goTo(true);
+      } else if (swipeOffset > SWIPE_THRESHOLD && safeIndex > 0) {
+        goTo(false);
+      }
+    }
+    setSwipeOffset(0);
+    touchRef.current.swiping = false;
+  }
+
   return (
     <div className="pb-8">
-      <div className="bg-white dark:bg-surface-card rounded-xl border border-border/60 shadow-sm dark:shadow-none overflow-hidden">
+      <div
+        className="bg-white dark:bg-surface-card rounded-xl border border-border/60 shadow-sm dark:shadow-none overflow-hidden touch-pan-y"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        style={{
+          transform: swipeOffset ? `translateX(${swipeOffset}px)` : undefined,
+          transition: swipeOffset ? "none" : "transform 0.3s ease-out",
+          opacity: swipeOffset ? Math.max(0.6, 1 - Math.abs(swipeOffset) / 400) : 1,
+        }}
+      >
         {/* Top bar */}
         <div className="flex items-center justify-between px-4 py-2.5 bg-gray-50/80 dark:bg-zinc-800/50 border-b border-border/50">
           <div className="flex items-center gap-1">
@@ -569,6 +614,11 @@ function FocusView({ cards, categories, companies, index, setIndex, onToggleStar
           </div>
         )}
       </div>
+      {cards.length > 1 && (
+        <p className="text-center text-[11px] text-gray-400 dark:text-zinc-600 mt-3 md:hidden">
+          Swipe left or right to navigate
+        </p>
+      )}
     </div>
   );
 }
