@@ -231,7 +231,7 @@ export function CardModal({ card, categories, companies, onAddCategory, onAddCom
           <div className="flex-1 flex flex-col">
             <div className="flex items-center justify-between mb-1.5">
               <label className="block text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wide">
-                Answer <span className="font-normal normal-case text-gray-400 dark:text-zinc-500">— use **bold** and - for bullets</span>
+                Answer <span className="font-normal normal-case text-gray-400 dark:text-zinc-500">— **bold** &nbsp; - bullets &nbsp; &gt; quote &nbsp; ==highlight==</span>
               </label>
               {!isEdit && (
                 <div className="flex items-center gap-1">

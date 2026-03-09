@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { X, Star, Edit3, Trash2, ChevronLeft, ChevronRight, Building2, Lightbulb } from "lucide-react";
 import { MarkdownAnswer } from "./MarkdownAnswer";
 
@@ -17,11 +17,17 @@ export function CardDetail({
 }) {
   const category = categories.find((c) => c.id === card.category);
   const company = companies.find((c) => c.id === card.company);
+  const backdropRef = useRef(null);
+  const mouseDownTarget = useRef(null);
 
   return (
     <div
+      ref={backdropRef}
       className="fixed inset-0 z-50 bg-white dark:bg-surface-dim md:bg-black/50 md:dark:bg-black/70 md:backdrop-blur-sm md:flex md:items-center md:justify-center md:p-6"
-      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+      onMouseDown={(e) => { mouseDownTarget.current = e.target; }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget && mouseDownTarget.current === e.currentTarget) onClose();
+      }}
     >
       <div className="h-full md:h-auto md:max-h-[90vh] md:w-full md:max-w-2xl md:rounded-xl bg-white dark:bg-surface-card md:shadow-2xl dark:md:shadow-none flex flex-col overflow-hidden">
         {/* Header */}

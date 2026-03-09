@@ -51,7 +51,9 @@ export const sampleCards = [
 - Advocated for an extra engineer with management, presenting data on workload
 - Created a shared dashboard so everyone could see progress in real time
 
-**Result:** We delivered 1 week early with zero downtime. Team satisfaction scores went from 3.2 to 4.5/5. The approach became our template for future migrations.`,
+**Result:** We delivered ==1 week early with zero downtime==. Team satisfaction scores went from 3.2 to 4.5/5. The approach became our template for future migrations.
+
+> The key takeaway: breaking a large, intimidating project into visible milestones rebuilt trust faster than any pep talk.`,
     hint: "Think about the payment system migration project and how you rebuilt team morale.",
     category: "leadership",
     company: "amazon",
