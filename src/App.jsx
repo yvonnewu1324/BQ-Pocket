@@ -10,6 +10,7 @@ import { MarkdownAnswer } from "./components/MarkdownAnswer";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "./components/ui/dialog";
 import { Button } from "./components/ui/button";
+import { Timer } from "./components/Timer";
 
 function App() {
   const {
@@ -534,24 +535,28 @@ function FocusView({ cards, categories, companies, index, setIndex, onToggleStar
             </button>
           </div>
 
-          <div className="flex items-center gap-1">
-            <button
-              onClick={() => goTo(false)}
-              disabled={safeIndex === 0}
-              className="p-1.5 text-gray-500 hover:text-brand-600 hover:bg-white dark:hover:bg-zinc-700 rounded-md disabled:opacity-25 disabled:cursor-not-allowed transition-all"
-            >
-              <ChevronLeft size={17} />
-            </button>
-            <span className="text-xs text-gray-400 dark:text-zinc-500 font-semibold tabular-nums min-w-[3rem] text-center">
-              {safeIndex + 1} / {cards.length}
-            </span>
-            <button
-              onClick={() => goTo(true)}
-              disabled={safeIndex === cards.length - 1}
-              className="p-1.5 text-gray-500 hover:text-brand-600 hover:bg-white dark:hover:bg-zinc-700 rounded-md disabled:opacity-25 disabled:cursor-not-allowed transition-all"
-            >
-              <ChevronRight size={17} />
-            </button>
+          <div className="flex items-center gap-2">
+            <Timer cardId={card.id} />
+            <div className="w-px h-4 bg-gray-200 dark:bg-zinc-700" />
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => goTo(false)}
+                disabled={safeIndex === 0}
+                className="p-1.5 text-gray-500 hover:text-brand-600 hover:bg-white dark:hover:bg-zinc-700 rounded-md disabled:opacity-25 disabled:cursor-not-allowed transition-all"
+              >
+                <ChevronLeft size={17} />
+              </button>
+              <span className="text-xs text-gray-400 dark:text-zinc-500 font-semibold tabular-nums min-w-[3rem] text-center">
+                {safeIndex + 1} / {cards.length}
+              </span>
+              <button
+                onClick={() => goTo(true)}
+                disabled={safeIndex === cards.length - 1}
+                className="p-1.5 text-gray-500 hover:text-brand-600 hover:bg-white dark:hover:bg-zinc-700 rounded-md disabled:opacity-25 disabled:cursor-not-allowed transition-all"
+              >
+                <ChevronRight size={17} />
+              </button>
+            </div>
           </div>
         </div>
 

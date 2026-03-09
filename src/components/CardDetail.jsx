@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { X, Star, Edit3, Trash2, ChevronLeft, ChevronRight, Building2, Lightbulb } from "lucide-react";
 import { MarkdownAnswer } from "./MarkdownAnswer";
+import { Timer } from "./Timer";
 
 export function CardDetail({
   card,
@@ -39,9 +40,12 @@ export function CardDetail({
             <X size={18} />
           </button>
 
-          <span className="text-xs text-gray-400 dark:text-zinc-500 font-semibold tabular-nums">
-            {currentIndex + 1} / {totalCount}
-          </span>
+          <div className="flex items-center gap-3">
+            <Timer cardId={card.id} />
+            <span className="text-xs text-gray-400 dark:text-zinc-500 font-semibold tabular-nums">
+              {currentIndex + 1} / {totalCount}
+            </span>
+          </div>
 
           <div className="flex gap-0.5">
             <button
