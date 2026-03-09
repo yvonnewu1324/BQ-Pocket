@@ -52,6 +52,7 @@ export const sampleCards = [
 - Created a shared dashboard so everyone could see progress in real time
 
 **Result:** We delivered 1 week early with zero downtime. Team satisfaction scores went from 3.2 to 4.5/5. The approach became our template for future migrations.`,
+    hint: "Think about the payment system migration project and how you rebuilt team morale.",
     category: "leadership",
     company: "amazon",
     starred: true,
@@ -71,6 +72,7 @@ export const sampleCards = [
 - Suggested we prototype both approaches over 2 days and let data decide
 
 **Result:** The hybrid approach satisfied both concerns. Response time was 40% faster for mobile. We built a stronger working relationship and started doing architecture reviews together regularly.`,
+    hint: "Use the API design disagreement — focus on the hybrid solution.",
     category: "conflict",
     company: "google",
     starred: false,
@@ -90,6 +92,7 @@ export const sampleCards = [
 - Shared the post-mortem in our engineering all-hands as a learning opportunity
 
 **Result:** The 3 safeguards were adopted org-wide. We haven't had a similar caching incident since. My manager noted that how I handled the failure actually increased trust in me across the team.`,
+    hint: "Talk about the caching feature incident and the post-mortem.",
     category: "failure",
     company: "meta",
     starred: true,
@@ -108,6 +111,7 @@ export const sampleCards = [
 - Proposed a phased approach: deliver a CLI tool in month 1 (quick win), then the full platform
 
 **Result:** The CLI tool had 80% adoption within the first month. The phased approach kept stakeholders happy and gave us time to build the platform right. I was recognized in the quarterly review for smooth transition leadership.`,
+    hint: "Mention the B2B to developer tools pivot and the phased approach.",
     category: "adaptability",
     company: "",
     starred: false,
@@ -127,6 +131,7 @@ export const sampleCards = [
 - Communicated updated timelines to the client PM proactively — they appreciated the transparency
 
 **Result:** Bug was fixed in 2 days (down from estimated 5). Client feature shipped on time. New hire completed their first PR in week 1 and said the onboarding was the best they'd experienced.`,
+    hint: "Use the Q4 example: production bug, client feature, and onboarding.",
     category: "time-management",
     company: "amazon",
     starred: true,
@@ -146,6 +151,7 @@ export const sampleCards = [
 - Rehearsed with a non-technical friend to catch any remaining jargon
 
 **Result:** Got unanimous approval in the first meeting — a first for engineering proposals. The CFO later said it was the clearest technical proposal she'd reviewed. The migration saved $200K/year in downtime costs.`,
+    hint: "The monolith-to-microservices pitch — kitchen analogy worked well.",
     category: "communication",
     company: "microsoft",
     starred: false,
@@ -165,6 +171,7 @@ export const sampleCards = [
 - Created a "no-shame questions" Slack channel for the whole team (normalized asking for help)
 
 **Result:** Within 6 weeks, they were completing tasks independently and ahead of schedule. They eventually became the go-to person for our testing framework. The Slack channel became one of the most active channels on the team.`,
+    hint: "Junior developer who was overwhelmed — paired programming approach.",
     category: "teamwork",
     company: "google",
     starred: true,
@@ -184,6 +191,7 @@ export const sampleCards = [
 - Added an index verification step to our migration checklist
 
 **Result:** Response times dropped 60% immediately. Prevented what would have become a P1 incident within 2 weeks based on the growth trend. The trend-based alerting caught 2 more issues in the following quarter before they became problems.`,
+    hint: "API response time trend — missing database indexes after migration.",
     category: "problem-solving",
     company: "",
     starred: false,

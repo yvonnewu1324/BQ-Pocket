@@ -1,9 +1,33 @@
 import { useState, useEffect } from "react";
-import { X, Plus } from "lucide-react";
+import { X, Plus, FileText } from "lucide-react";
+
+const ANSWER_TEMPLATES = [
+  {
+    id: "star",
+    label: "STAR",
+    content: `**Situation:** \n\n**Task:** \n\n**Action:**\n- \n- \n\n**Result:** `,
+  },
+  {
+    id: "par",
+    label: "PAR",
+    content: `**Problem:** \n\n**Action:**\n- \n- \n\n**Result:** `,
+  },
+  {
+    id: "car",
+    label: "CAR",
+    content: `**Challenge:** \n\n**Action:**\n- \n- \n\n**Result:** `,
+  },
+  {
+    id: "soar",
+    label: "SOAR",
+    content: `**Situation:** \n\n**Obstacle:** \n\n**Action:**\n- \n- \n\n**Result:** `,
+  },
+];
 
 export function CardModal({ card, categories, companies, onAddCategory, onAddCompany, onSave, onClose }) {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
+  const [hint, setHint] = useState("");
   const [category, setCategory] = useState("");
   const [company, setCompany] = useState("");
   const [newCategory, setNewCategory] = useState("");
@@ -15,11 +39,13 @@ export function CardModal({ card, categories, companies, onAddCategory, onAddCom
     if (card) {
       setQuestion(card.question);
       setAnswer(card.answer);
+      setHint(card.hint || "");
       setCategory(card.category);
       setCompany(card.company || "");
     } else {
       setQuestion("");
       setAnswer("");
+      setHint("");
       setCategory(categories[0]?.id || "");
       setCompany("");
     }
@@ -49,6 +75,10 @@ export function CardModal({ card, categories, companies, onAddCategory, onAddCom
     setShowNewCompany(false);
   }
 
+  function applyTemplate(template) {
+    setAnswer(template.content);
+  }
+
   function handleSubmit(e) {
     e.preventDefault();
     if (!question.trim() || !answer.trim()) return;
@@ -56,6 +86,7 @@ export function CardModal({ card, categories, companies, onAddCategory, onAddCom
       ...(card || {}),
       question: question.trim(),
       answer: answer.trim(),
+      hint: hint.trim(),
       category,
       company,
       starred: card?.starred || false,
@@ -184,10 +215,41 @@ export function CardModal({ card, categories, companies, onAddCategory, onAddCom
             />
           </div>
 
-          <div className="flex-1 flex flex-col">
+          <div>
             <label className="block text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wide mb-1.5">
-              Answer <span className="font-normal normal-case text-gray-400 dark:text-zinc-500">— use **bold** and - for bullets</span>
+              Hint <span className="font-normal normal-case text-gray-400 dark:text-zinc-500">(optional — a short reminder to jog your memory)</span>
             </label>
+            <input
+              type="text"
+              value={hint}
+              onChange={(e) => setHint(e.target.value)}
+              placeholder="e.g., Think about the Q3 project with the tight deadline..."
+              className="w-full px-3 py-2.5 border border-border rounded-lg text-sm bg-white dark:bg-zinc-900 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-brand-100 dark:focus:ring-brand-500/30 focus:border-brand-400"
+            />
+          </div>
+
+          <div className="flex-1 flex flex-col">
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="block text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wide">
+                Answer <span className="font-normal normal-case text-gray-400 dark:text-zinc-500">— use **bold** and - for bullets</span>
+              </label>
+              {!isEdit && (
+                <div className="flex items-center gap-1">
+                  <FileText size={12} className="text-gray-400 dark:text-zinc-500" />
+                  <span className="text-[10px] text-gray-400 dark:text-zinc-500 mr-1">Template:</span>
+                  {ANSWER_TEMPLATES.map((t) => (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => applyTemplate(t)}
+                      className="px-2 py-0.5 text-[11px] font-semibold rounded-md border border-gray-200 dark:border-zinc-700 text-gray-500 dark:text-zinc-400 hover:border-brand-400 hover:text-brand-600 dark:hover:border-brand-500 dark:hover:text-brand-400 hover:bg-brand-50 dark:hover:bg-brand-500/10 transition-all"
+                    >
+                      {t.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
             <textarea
               value={answer}
               onChange={(e) => setAnswer(e.target.value)}

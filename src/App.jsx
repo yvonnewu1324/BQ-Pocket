@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Star, Shuffle, ChevronRight, ChevronLeft, Edit3, Trash2, Eye, EyeOff, Building2, Filter, X, List, Zap, Moon, Sun } from "lucide-react";
+import { Plus, Star, Shuffle, ChevronRight, ChevronLeft, Edit3, Trash2, Eye, EyeOff, Building2, Filter, X, List, Zap, Moon, Sun, Lightbulb } from "lucide-react";
 import { useCards } from "./hooks/useCards";
 import { SearchBar } from "./components/SearchBar";
 import { CardModal } from "./components/CardModal";
@@ -438,6 +438,7 @@ const swipeVariants = {
 
 function FocusView({ cards, categories, companies, index, setIndex, onToggleStar, onEdit, onDelete }) {
   const [revealedIds, setRevealedIds] = useState(new Set());
+  const [hintVisibleIds, setHintVisibleIds] = useState(new Set());
   const [animating, setAnimating] = useState(false);
   const [direction, setDirection] = useState(0);
   const scrollRef = useRef(null);
@@ -472,6 +473,11 @@ function FocusView({ cards, categories, companies, index, setIndex, onToggleStar
       : Math.max(0, safeIndex - 1);
     if (target !== safeIndex) {
       setRevealedIds((prev) => {
+        const next = new Set(prev);
+        next.delete(card.id);
+        return next;
+      });
+      setHintVisibleIds((prev) => {
         const next = new Set(prev);
         next.delete(card.id);
         return next;
@@ -585,6 +591,25 @@ function FocusView({ cards, categories, companies, index, setIndex, onToggleStar
                 <h2 className="text-xl md:text-2xl font-extrabold text-text-primary leading-snug tracking-tight">
                   {card.question}
                 </h2>
+
+                {card.hint && !revealed && (
+                  <div className="mt-4">
+                    {hintVisibleIds.has(card.id) ? (
+                      <div className="flex items-start gap-2 px-3 py-2.5 rounded-lg bg-amber-50/70 dark:bg-amber-500/10 border border-amber-200/60 dark:border-amber-500/20">
+                        <Lightbulb size={14} className="shrink-0 mt-0.5 text-amber-500 dark:text-amber-400" />
+                        <p className="text-sm text-amber-700 dark:text-amber-300/90">{card.hint}</p>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setHintVisibleIds((prev) => new Set(prev).add(card.id))}
+                        className="flex items-center gap-1.5 text-xs font-semibold text-amber-500 dark:text-amber-400 hover:text-amber-600 dark:hover:text-amber-300 transition-colors"
+                      >
+                        <Lightbulb size={13} />
+                        Show Hint
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Reveal */}

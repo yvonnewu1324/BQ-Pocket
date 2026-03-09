@@ -32,10 +32,12 @@ export function useCards() {
 
   const filteredCards = useMemo(() => {
     return cards.filter((card) => {
+      const q = searchQuery.toLowerCase();
       const matchesSearch =
         !searchQuery ||
-        card.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        card.answer.toLowerCase().includes(searchQuery.toLowerCase());
+        card.question.toLowerCase().includes(q) ||
+        card.answer.toLowerCase().includes(q) ||
+        (card.hint && card.hint.toLowerCase().includes(q));
 
       const matchesCategory =
         activeCategory === "all" || card.category === activeCategory;
@@ -66,7 +68,7 @@ export function useCards() {
   }, [cards, companies]);
 
   function addCard(card) {
-    const newCard = { ...card, id: Date.now().toString(), company: card.company || "" };
+    const newCard = { ...card, id: Date.now().toString(), company: card.company || "", hint: card.hint || "" };
     setCards((prev) => [newCard, ...prev]);
     return newCard;
   }

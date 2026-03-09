@@ -1,4 +1,5 @@
-import { X, Star, Edit3, Trash2, ChevronLeft, ChevronRight, Building2 } from "lucide-react";
+import { useState } from "react";
+import { X, Star, Edit3, Trash2, ChevronLeft, ChevronRight, Building2, Lightbulb } from "lucide-react";
 import { MarkdownAnswer } from "./MarkdownAnswer";
 
 export function CardDetail({
@@ -77,9 +78,15 @@ export function CardDetail({
                 </span>
               )}
             </div>
-            <h2 className="text-xl md:text-2xl font-extrabold text-text-primary leading-snug tracking-tight mb-6">
+            <h2 className="text-xl md:text-2xl font-extrabold text-text-primary leading-snug tracking-tight mb-4">
               {card.question}
             </h2>
+            {card.hint && (
+              <div className="flex items-start gap-2 mb-6 px-3 py-2.5 rounded-lg bg-amber-50/70 dark:bg-amber-500/10 border border-amber-200/60 dark:border-amber-500/20">
+                <Lightbulb size={14} className="shrink-0 mt-0.5 text-amber-500 dark:text-amber-400" />
+                <p className="text-sm text-amber-700 dark:text-amber-300/90">{card.hint}</p>
+              </div>
+            )}
             <div className="border-t border-border/50 pt-6">
               <MarkdownAnswer text={card.answer} />
             </div>
