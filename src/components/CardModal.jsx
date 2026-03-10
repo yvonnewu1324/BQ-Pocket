@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { X, Plus, FileText } from "lucide-react";
 
 const ANSWER_TEMPLATES = [
@@ -94,15 +94,18 @@ export function CardModal({ card, categories, companies, onAddCategory, onAddCom
   }
 
   const isEdit = !!card?.id;
+  const mouseDownTarget = useRef(null);
 
   return (
     <div
       className="fixed inset-0 z-50 md:flex md:items-center md:justify-center md:p-6 bg-black/50 dark:bg-black/70 backdrop-blur-sm"
-      onClick={onClose}
+      onMouseDown={(e) => { mouseDownTarget.current = e.target; }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget && mouseDownTarget.current === e.currentTarget) onClose();
+      }}
     >
       <div
         className="h-full md:h-auto md:max-h-[90vh] md:w-full md:max-w-2xl md:rounded-xl bg-white dark:bg-surface-card md:shadow-2xl dark:md:shadow-none flex flex-col overflow-hidden"
-        onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between px-5 py-3.5 bg-gray-50/80 dark:bg-zinc-800/50 border-b border-border/50">
           <h2 className="text-base font-bold text-text-primary">
