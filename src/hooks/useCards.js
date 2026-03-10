@@ -17,8 +17,15 @@ function save(key, data) {
   localStorage.setItem(key, JSON.stringify(data));
 }
 
+function migrateCard(card) {
+  if (card.companies) return card;
+  const companies = card.company ? [card.company] : [];
+  const { company, ...rest } = card;
+  return { ...rest, companies };
+}
+
 export function useCards() {
-  const [cards, setCards] = useState(() => load(STORAGE_KEY) || sampleCards);
+  const [cards, setCards] = useState(() => (load(STORAGE_KEY) || sampleCards).map(migrateCard));
   const [categories, setCategories] = useState(() => load(CATEGORIES_KEY) || DEFAULT_CATEGORIES);
   const [companies, setCompanies] = useState(() => load(COMPANIES_KEY) || DEFAULT_COMPANIES);
   const [searchQuery, setSearchQuery] = useState("");
@@ -43,7 +50,7 @@ export function useCards() {
         activeCategory === "all" || card.category === activeCategory;
 
       const matchesCompany =
-        activeCompany === "all" || card.company === activeCompany;
+        activeCompany === "all" || (card.companies && card.companies.includes(activeCompany));
 
       const matchesStarred = !showStarredOnly || card.starred;
 
@@ -62,13 +69,13 @@ export function useCards() {
   const companyCounts = useMemo(() => {
     const counts = { all: cards.length };
     companies.forEach((co) => {
-      counts[co.id] = cards.filter((c) => c.company === co.id).length;
+      counts[co.id] = cards.filter((c) => c.companies && c.companies.includes(co.id)).length;
     });
     return counts;
   }, [cards, companies]);
 
   function addCard(card) {
-    const newCard = { ...card, id: Date.now().toString(), company: card.company || "", hint: card.hint || "" };
+    const newCard = { ...card, id: Date.now().toString(), companies: card.companies || [], hint: card.hint || "" };
     setCards((prev) => [newCard, ...prev]);
     return newCard;
   }

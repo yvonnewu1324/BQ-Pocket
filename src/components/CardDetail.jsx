@@ -17,7 +17,7 @@ export function CardDetail({
   totalCount,
 }) {
   const category = categories.find((c) => c.id === card.category);
-  const company = companies.find((c) => c.id === card.company);
+  const cardCompanies = (card.companies || []).map((cid) => companies.find((c) => c.id === cid)).filter(Boolean);
   const backdropRef = useRef(null);
   const mouseDownTarget = useRef(null);
 
@@ -81,12 +81,12 @@ export function CardDetail({
                   {category.label}
                 </span>
               )}
-              {company && (
-                <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+              {cardCompanies.map((co) => (
+                <span key={co.id} className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400">
                   <Building2 size={10} />
-                  {company.label}
+                  {co.label}
                 </span>
-              )}
+              ))}
             </div>
             <h2 className="text-xl md:text-2xl font-extrabold text-text-primary leading-snug tracking-tight mb-4">
               {card.question}

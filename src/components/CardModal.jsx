@@ -29,7 +29,7 @@ export function CardModal({ card, categories, companies, onAddCategory, onAddCom
   const [answer, setAnswer] = useState("");
   const [hint, setHint] = useState("");
   const [category, setCategory] = useState("");
-  const [company, setCompany] = useState("");
+  const [selectedCompanies, setSelectedCompanies] = useState([]);
   const [newCategory, setNewCategory] = useState("");
   const [newCompany, setNewCompany] = useState("");
   const [showNewCategory, setShowNewCategory] = useState(false);
@@ -41,13 +41,13 @@ export function CardModal({ card, categories, companies, onAddCategory, onAddCom
       setAnswer(card.answer);
       setHint(card.hint || "");
       setCategory(card.category);
-      setCompany(card.company || "");
+      setSelectedCompanies(card.companies || (card.company ? [card.company] : []));
     } else {
       setQuestion("");
       setAnswer("");
       setHint("");
       setCategory(categories[0]?.id || "");
-      setCompany("");
+      setSelectedCompanies([]);
     }
   }, [card, categories]);
 
@@ -70,9 +70,17 @@ export function CardModal({ card, categories, companies, onAddCategory, onAddCom
     const label = newCompany.trim();
     if (!label) return;
     const co = onAddCompany(label);
-    setCompany(co.id);
+    if (!selectedCompanies.includes(co.id)) {
+      setSelectedCompanies((prev) => [...prev, co.id]);
+    }
     setNewCompany("");
     setShowNewCompany(false);
+  }
+
+  function toggleCompany(id) {
+    setSelectedCompanies((prev) =>
+      prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]
+    );
   }
 
   function applyTemplate(template) {
@@ -88,7 +96,7 @@ export function CardModal({ card, categories, companies, onAddCategory, onAddCom
       answer: answer.trim(),
       hint: hint.trim(),
       category,
-      company,
+      companies: selectedCompanies,
       starred: card?.starred || false,
     });
   }
@@ -164,44 +172,59 @@ export function CardModal({ card, categories, companies, onAddCategory, onAddCom
 
             <div>
               <label className="block text-xs font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wide mb-1.5">
-                Company <span className="font-normal normal-case text-gray-400 dark:text-zinc-500">(optional)</span>
+                Companies <span className="font-normal normal-case text-gray-400 dark:text-zinc-500">(optional, multi-select)</span>
               </label>
-              {showNewCompany ? (
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={newCompany}
-                    onChange={(e) => setNewCompany(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleAddCompany())}
-                    placeholder="Company name"
-                    autoFocus
-                    className="flex-1 px-3 py-2 border border-brand-300 rounded-lg text-sm bg-white dark:bg-zinc-900 dark:border-brand-500/50 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-brand-100 dark:focus:ring-brand-500/30"
-                  />
-                  <button type="button" onClick={handleAddCompany}
-                    className="px-3 py-2 bg-brand-600 text-white rounded-lg text-sm font-semibold hover:bg-brand-700 transition-colors">
-                    Add
-                  </button>
-                  <button type="button" onClick={() => { setShowNewCompany(false); setNewCompany(""); }}
-                    className="p-2 text-gray-400 hover:text-gray-600 dark:text-zinc-500 dark:hover:text-zinc-300">
-                    <X size={15} />
-                  </button>
-                </div>
-              ) : (
-                <div className="flex gap-2">
-                  <select value={company} onChange={(e) => setCompany(e.target.value)}
-                    className="flex-1 px-3 py-2 bg-white dark:bg-zinc-900 border border-border rounded-lg text-sm dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-brand-100 dark:focus:ring-brand-500/30 focus:border-brand-400">
-                    <option value="">None</option>
-                    {companies.map((co) => (
-                      <option key={co.id} value={co.id}>{co.label}</option>
-                    ))}
-                  </select>
+              <div className="flex flex-wrap gap-1.5 min-h-[38px] px-2.5 py-2 border border-border rounded-lg bg-white dark:bg-zinc-900">
+                {companies.map((co) => {
+                  const active = selectedCompanies.includes(co.id);
+                  return (
+                    <button
+                      key={co.id}
+                      type="button"
+                      onClick={() => toggleCompany(co.id)}
+                      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold transition-all ${
+                        active
+                          ? "bg-brand-600 text-white shadow-sm"
+                          : "bg-gray-100 text-gray-500 hover:bg-gray-200 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700"
+                      }`}
+                    >
+                      {co.label}
+                      {active && <X size={10} className="ml-0.5" />}
+                    </button>
+                  );
+                })}
+                {showNewCompany ? (
+                  <div className="flex items-center gap-1">
+                    <input
+                      type="text"
+                      value={newCompany}
+                      onChange={(e) => setNewCompany(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") { e.preventDefault(); handleAddCompany(); }
+                        if (e.key === "Escape") { setShowNewCompany(false); setNewCompany(""); }
+                      }}
+                      placeholder="Name"
+                      autoFocus
+                      className="w-24 px-2 py-1 border border-brand-300 dark:border-brand-500/50 rounded-full text-xs bg-transparent dark:text-zinc-200 focus:outline-none"
+                    />
+                    <button type="button" onClick={handleAddCompany}
+                      className="px-2 py-1 bg-brand-600 text-white rounded-full text-xs font-semibold hover:bg-brand-700 transition-colors">
+                      Add
+                    </button>
+                    <button type="button" onClick={() => { setShowNewCompany(false); setNewCompany(""); }}
+                      className="p-0.5 text-gray-400 hover:text-gray-600 dark:text-zinc-500 dark:hover:text-zinc-300">
+                      <X size={12} />
+                    </button>
+                  </div>
+                ) : (
                   <button type="button" onClick={() => setShowNewCompany(true)}
-                    className="shrink-0 p-2 border border-dashed border-gray-300 dark:border-zinc-600 text-gray-400 dark:text-zinc-500 rounded-lg hover:border-brand-400 hover:text-brand-500 hover:bg-brand-50 dark:hover:bg-brand-500/10 transition-all"
-                    title="Add new company">
-                    <Plus size={15} />
+                    className="inline-flex items-center gap-0.5 px-2.5 py-1 rounded-full text-xs font-semibold border border-dashed border-gray-300 dark:border-zinc-600 text-gray-400 dark:text-zinc-500 hover:border-brand-400 hover:text-brand-500 dark:hover:border-brand-500 dark:hover:text-brand-400 transition-all"
+                  >
+                    <Plus size={10} />
+                    New
                   </button>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
 

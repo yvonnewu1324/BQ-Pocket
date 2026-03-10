@@ -271,7 +271,7 @@ function App() {
             <div className="bg-white dark:bg-surface-card rounded-xl border border-border/60 shadow-sm dark:shadow-none overflow-hidden">
               {pagedCards.map((card, idx) => {
                 const category = categories.find((c) => c.id === card.category);
-                const company = companies.find((c) => c.id === card.company);
+                const cardCompanies = (card.companies || []).map((cid) => companies.find((c) => c.id === cid)).filter(Boolean);
                 const globalIdx = safePage * ITEMS_PER_PAGE + idx;
                 const isLast = idx === pagedCards.length - 1;
                 return (
@@ -309,12 +309,12 @@ function App() {
                             {category.label}
                           </span>
                         )}
-                        {company && (
-                          <span className="inline-flex items-center gap-1 text-[14px] font-semibold px-3 py-0.5 rounded-full bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+                        {cardCompanies.map((co) => (
+                          <span key={co.id} className="inline-flex items-center gap-1 text-[14px] font-semibold px-3 py-0.5 rounded-full bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400">
                             <Building2 size={12} />
-                            {company.label}
+                            {co.label}
                           </span>
-                        )}
+                        ))}
                       </div>
                     </div>
                     <ChevronRight
@@ -465,7 +465,7 @@ function FocusView({ cards, categories, companies, index, setIndex, onToggleStar
   }
 
   const category = categories.find((c) => c.id === card?.category);
-  const company = companies.find((c) => c.id === card?.company);
+  const cardCompanies = card ? (card.companies || []).map((cid) => companies.find((c) => c.id === cid)).filter(Boolean) : [];
   if (!card) return null;
 
   function goTo(next) {
@@ -585,12 +585,12 @@ function FocusView({ cards, categories, companies, index, setIndex, onToggleStar
                       {category.label}
                     </span>
                   )}
-                  {company && (
-                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+                  {cardCompanies.map((co) => (
+                    <span key={co.id} className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400">
                       <Building2 size={10} />
-                      {company.label}
+                      {co.label}
                     </span>
-                  )}
+                  ))}
                 </div>
 
                 <h2 className="text-xl md:text-2xl font-extrabold text-text-primary leading-snug tracking-tight">
